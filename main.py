@@ -69,24 +69,24 @@ class World:
     
 import random
 class Piece:
-    state = set() # set of points indicating its shape
-    
-    def addCubeToState(self) -> None:
-        x_start = round(random.random() * 8)
-        y_start = round(random.random() * 18)
-        x = x_start + round(random.random() * 3)
-        y = y_start + round(random.random() * 3)
+    def addCubeToState(self, x_start: int, y_start : int) -> None:
+        x = x_start + round(random.random() * 2)
+        y = y_start + round(random.random() * 2)
         while (x,y) in self.state:
-            x = x_start + round(random.random() * 3)
-            y = y_start + round(random.random() * 3)
+            x = x_start + round(random.random() * 2)
+            y = y_start + round(random.random() * 2)
+        
         
         self.state.add((x,y))
  
     def initializeState(self) -> None:
+        x_start = round(random.random() * 8)
+        y_start = 18
         for i in range(4): # 4 squares in a tromino
-            self.addCubeToState()
+            self.addCubeToState(x_start, y_start)
     
     def __init__(self) -> None:
+        self.state = set()
         self.initializeState() # TODO how to randomly generate the state as one of the trominos?
         
     def rotate(self) -> None:
