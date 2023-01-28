@@ -3,7 +3,7 @@ from typing import List
 
 class World:
     WIDTH = 10
-    HEIGHT = 50
+    HEIGHT = 20
 
     board = set() # set of points that exist in the world
     
@@ -26,7 +26,8 @@ class World:
                 result.append(i)
             result.append(0) # the deleted line has no displacement
             
-            
+        return result
+        
     def deleteLine(self, y : int) -> None:
         for x in range(self.WIDTH):
             if (x,y) in self.board:
@@ -66,12 +67,24 @@ class World:
     def checkIfCoordInState(self, x: int, y: int) -> bool:
         return (x,y) in self.board
     
-    
+import random
 class Piece:
     state = set() # set of points indicating its shape
     
-    def initializeState() -> None:
-        pass #TODO
+    def addCubeToState(self) -> None:
+        x_start = round(random.random() * 8)
+        y_start = round(random.random() * 18)
+        x = x_start + round(random.random() * 3)
+        y = y_start + round(random.random() * 3)
+        while (x,y) in self.state:
+            x = x_start + round(random.random() * 3)
+            y = y_start + round(random.random() * 3)
+        
+        self.state.add((x,y))
+ 
+    def initializeState(self) -> None:
+        for i in range(4): # 4 squares in a tromino
+            self.addCubeToState()
     
     def __init__(self) -> None:
         self.initializeState() # TODO how to randomly generate the state as one of the trominos?
@@ -94,11 +107,11 @@ class Piece:
         new_state = set()
         for (x,y) in self.state:
             new_coord = (x+dx,y+dy)
-            if new_coord in world.board:
+            if new_coord in world.board or new_coord[0] >= world.WIDTH or new_coord[0] < 0 or new_coord[1] < 0:
                 if dy != 0:
                     return True # collision below!
                 else:
-                    return # do not update state of the piece when colliding horizontally.
+                    return False # do not update state of the piece when colliding horizontally.
             new_state.add(new_coord)
 
         self.state = new_state
@@ -106,11 +119,15 @@ class Piece:
 
 def render(world: World, piece : Piece) -> None:
     combined_state = world.board.union(piece.state)
+    lines = []
     for y in range(world.HEIGHT):
         line = "|"
         for x in range(world.WIDTH):
             line += "*" if (x,y) in combined_state else " "
         line += "|"
+        lines.append(line)
+        
+    for line in reversed(lines):
         print(line)
     
     print("+" * (2 + world.WIDTH))
@@ -125,22 +142,23 @@ def main() -> None:
         # current falling piece
         piece = Piece()
         
-        render(world, piece)
-        
-        # player callbacks
-        key = input("Enter a direction: ")
-        if key == "L":
-            piece.displace(-1, 0)
-        if key == "R":
-            piece.displace(1,0)
-        
-        collision_below = piece.displace(0,-1) # piece is always moving down whether we like it or not!
-        if collision_below:
-            world.addPiece(piece.state) # piece gets stuck
-        
-        # scoring/line crunching
-        num_deleted_lines = world.resolveCompleteLines()
-        score += num_deleted_lines
+        while True:
+            render(world, piece)
+            # player callbacks
+            key = input("Enter a direction: ")
+            if key == "L":
+                piece.displace(-1, 0, world)
+            if key == "R":
+                piece.displace(1,0, world)
+            
+            collision_below = piece.displace(0,-1, world) # piece is always moving down whether we like it or not!
+            if collision_below:
+                world.addPiece(piece.state) # piece gets stuck
+                # scoring/line crunching
+                num_deleted_lines = world.resolveCompleteLines()
+                score += num_deleted_lines
+                
+                break # generate new piece
     
 
 if __name__ == "__main__":
