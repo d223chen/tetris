@@ -69,21 +69,28 @@ class World:
     
 import random
 class Piece:
-    def addCubeToState(self, x_start: int, y_start : int) -> None:
-        x = x_start + round(random.random() * 2)
-        y = y_start + round(random.random() * 2)
-        while (x,y) in self.state:
-            x = x_start + round(random.random() * 2)
-            y = y_start + round(random.random() * 2)
+    def adjacentPositions(self, x :int, y : int) -> bool:
+        adjacent_positions = {(x-1,y),(x+1,y),(x,y-1),(x,y+1)}
+        return adjacent_positions
+    
+    def boundaryOfState(self) -> set:
+        adjacent_positions = set()
+        for (x,y) in self.state:
+            adjacent_to_block = self.adjacentPositions(x,y)
+            adjacent_positions = adjacent_positions.union(adjacent_to_block - self.state)
+            
+        return adjacent_positions
         
-        
-        self.state.add((x,y))
+    def addCubeToState(self) -> None:
+        boundary = self.boundaryOfState()
+        self.state.add(random.choice(tuple(boundary)))
  
     def initializeState(self) -> None:
-        x_start = round(random.random() * 8)
-        y_start = 18
-        for i in range(4): # 4 squares in a tromino
-            self.addCubeToState(x_start, y_start)
+        x_start = round(1 + random.random() * 8)
+        y_start = 16
+        self.state.add((x_start, y_start))
+        for i in range(3): # 4 squares in a tromino
+            self.addCubeToState()
     
     def __init__(self) -> None:
         self.state = set()
