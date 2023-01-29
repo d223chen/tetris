@@ -104,7 +104,24 @@ class Piece:
         self.initializeState()  # TODO how to randomly generate the state as one of the trominos?
 
     def rotate(self) -> None:
-        pass  # TODO
+        """Rotate clockwise 90 degrees = reflect across the diagonal going from bottom left to top right, and then horizontally"""
+        average_x = sum([p[0] for p in self.state]) // 4
+        average_y = sum([p[1] for p in self.state]) // 4
+        
+        centroid = (average_x, average_y)
+        new_state = set()
+        for p in self.state:
+            new_p = p
+            # diagonal reflection
+            # TODO currently this is just a horizontal flip
+            
+            # horizontal reflection
+            new_p = (new_p[0], centroid[1] + (centroid[1] - new_p[1]))  
+            
+            new_state.add(new_p)
+            
+        self.state = new_state
+        
 
     def displace(self, dx: int, dy: int, world: World) -> bool:
         """N.B. positive dx means moving right, positive dy means moving up
@@ -150,6 +167,7 @@ def render(world: World, piece: Piece) -> None:
 def main() -> None:
     world = World()
     world.addLine(0) # testing
+    world.addLine(1) # testing
     score = 0
 
     while True:
@@ -164,6 +182,8 @@ def main() -> None:
                 piece.displace(-1, 0, world)
             if key == "R":
                 piece.displace(1, 0, world)
+            if key == "r":
+                piece.rotate()
 
             collision_below = piece.displace(0, -1, world)  # piece is always moving down whether we like it or not!
             if collision_below:
