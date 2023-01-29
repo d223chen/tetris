@@ -26,7 +26,6 @@ class World:
             for _ in range(prev_y + 1, cur_y):
                 result.append(i)
             result.append(0)  # the deleted line has no displacement
-            
 
         return result
 
@@ -67,13 +66,13 @@ class World:
 
     def checkIfCoordInState(self, x: int, y: int) -> bool:
         return (x, y) in self.board
-    
-    
+
     def addLine(self, y: int) -> None:
         """For testing only"""
-        
+
         for x in range(self.WIDTH):
-            self.board.add((x,y))
+            self.board.add((x, y))
+
 
 class Piece:
     def adjacentPositions(self, x: int, y: int) -> bool:
@@ -101,27 +100,26 @@ class Piece:
 
     def __init__(self) -> None:
         self.state = set()
-        self.initializeState()  # TODO how to randomly generate the state as one of the trominos?
+        self.initializeState()
 
     def rotate(self) -> None:
         """Rotate clockwise 90 degrees = reflect across the diagonal going from bottom left to top right, and then horizontally"""
         average_x = sum([p[0] for p in self.state]) // 4
         average_y = sum([p[1] for p in self.state]) // 4
-        
+
         centroid = (average_x, average_y)
         new_state = set()
         for p in self.state:
             new_p = p
             # diagonal reflection
             # TODO currently this is just a horizontal flip
-            
+
             # horizontal reflection
-            new_p = (new_p[0], centroid[1] + (centroid[1] - new_p[1]))  
-            
+            new_p = (new_p[0], centroid[1] + (centroid[1] - new_p[1]))
+
             new_state.add(new_p)
-            
+
         self.state = new_state
-        
 
     def displace(self, dx: int, dy: int, world: World) -> bool:
         """N.B. positive dx means moving right, positive dy means moving up
@@ -166,8 +164,8 @@ def render(world: World, piece: Piece) -> None:
 
 def main() -> None:
     world = World()
-    world.addLine(0) # testing
-    world.addLine(1) # testing
+    world.addLine(0)  # testing
+    world.addLine(1)  # testing
     score = 0
 
     while True:
