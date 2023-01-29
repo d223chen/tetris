@@ -104,18 +104,26 @@ class Piece:
 
     def rotate(self) -> None:
         """Rotate clockwise 90 degrees = reflect across the diagonal going from bottom left to top right, and then horizontally"""
-        average_x = sum([p[0] for p in self.state]) // 4
-        average_y = sum([p[1] for p in self.state]) // 4
+        
+        # create a 3x3 bounding box starting at (min_x, min_y) and ending at (min_x + 2, min_y + 2)
+        min_x = min([p[0] for p in self.state])
+        max_x = min_x + 2
+        min_y = min([p[1] for p in self.state])
+        max_y = min_y + 2
 
-        centroid = (average_x, average_y)
         new_state = set()
         for p in self.state:
             new_p = p
             # diagonal reflection
-            # TODO currently this is just a horizontal flip
+            dx = new_p[0] - min_x
+            dy = new_p[1] - min_y
+            new_p = (min_x + dy, min_y + dx)
 
             # horizontal reflection
-            new_p = (new_p[0], centroid[1] + (centroid[1] - new_p[1]))
+            if new_p[1] == min_y:
+                new_p = (new_p[0], max_y)
+            elif new_p[1] == max_y:
+                new_p = (new_p[0], min_y)
 
             new_state.add(new_p)
 
