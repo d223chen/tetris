@@ -20,12 +20,13 @@ class World:
 
     def getDisplacementsPerLine(self, deleted_lines: List[int]) -> List[int]:
         result = []
-        for i in range(len(deleted_lines)):
-            cur_y = deleted_lines[i]
+        for i in range(len(deleted_lines) + 1):
+            cur_y = deleted_lines[i] if i < len(deleted_lines) else 50
             prev_y = deleted_lines[i - 1] if i > 0 else -1
             for _ in range(prev_y + 1, cur_y):
                 result.append(i)
             result.append(0)  # the deleted line has no displacement
+            
 
         return result
 
@@ -41,10 +42,10 @@ class World:
 
         Returns the number of deleted lines
         """
-        deleted_lines = set()  # set of y coordinates
+        deleted_lines = []  # list of y coordinates
         for y in range(self.HEIGHT):
             if self.lineIsComplete(y):
-                deleted_lines.add(y)
+                deleted_lines.append(y)
 
         for y in deleted_lines:
             self.deleteLine(y)
@@ -66,7 +67,13 @@ class World:
 
     def checkIfCoordInState(self, x: int, y: int) -> bool:
         return (x, y) in self.board
-
+    
+    
+    def addLine(self, y: int) -> None:
+        """For testing only"""
+        
+        for x in range(self.WIDTH):
+            self.board.add((x,y))
 
 class Piece:
     def adjacentPositions(self, x: int, y: int) -> bool:
@@ -142,6 +149,7 @@ def render(world: World, piece: Piece) -> None:
 
 def main() -> None:
     world = World()
+    world.addLine(0) # testing
     score = 0
 
     while True:
@@ -151,7 +159,7 @@ def main() -> None:
         while True:
             render(world, piece)
             # player callbacks
-            key = input("Enter a direction: ")
+            key = input(f"Enter a direction ({score=}): ")
             if key == "L":
                 piece.displace(-1, 0, world)
             if key == "R":
